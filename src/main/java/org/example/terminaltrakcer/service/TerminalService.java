@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import org.example.terminaltrakcer.dto.mappers.TerminalMapper;
 import org.example.terminaltrakcer.dto.terminal.TerminalCreateDTO;
 import org.example.terminaltrakcer.dto.terminal.TerminalReadDTO;
+import org.example.terminaltrakcer.dto.terminal.TerminalUpdateDTO;
 import org.example.terminaltrakcer.dto.terminal.TerminalWithDistanceDTO;
 import org.example.terminaltrakcer.entity.Terminal;
 import org.example.terminaltrakcer.repository.TerminalRepository;
@@ -65,5 +66,24 @@ public class TerminalService {
             dto.setDistance((Double) row[4]);
             return dto;
         }).collect(Collectors.toList());
+    }
+
+    public TerminalReadDTO updateTerminal(TerminalUpdateDTO terminalUpdateDTO) {
+        Terminal existingTerminal = terminalRepository.findById(UUID.fromString(terminalUpdateDTO.getId()))
+                .orElse(null);
+        if (existingTerminal == null) return null;
+
+        terminalMapper.updateEntity(terminalUpdateDTO, existingTerminal);
+        Terminal updatedTerminal = terminalRepository.save(existingTerminal);
+        return terminalMapper.toReadDTO(updatedTerminal);
+    }
+
+    public boolean deleteTerminal(String id) {
+        UUID terminalId = UUID.fromString(id);
+        if (terminalRepository.existsById(terminalId)) {
+            terminalRepository.deleteById(terminalId);
+            return true;
+        }
+        return false;
     }
 }
