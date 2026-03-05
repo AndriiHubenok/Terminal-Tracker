@@ -11,6 +11,7 @@ import org.example.terminaltrakcer.dto.terminal.TerminalWithDistanceDTO;
 import org.example.terminaltrakcer.entity.Terminal;
 import org.example.terminaltrakcer.service.TerminalService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,7 @@ import java.util.List;
 public class TerminalController {
     private final TerminalService terminalService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create")
     public ResponseEntity<TerminalReadDTO> createTerminal(@Valid @RequestBody TerminalCreateDTO terminalCreateDTO) {
         return ResponseEntity.status(201).body(terminalService.addTerminal(terminalCreateDTO));
@@ -46,6 +48,7 @@ public class TerminalController {
         return ResponseEntity.ok().body(nearbyTerminals);
     }
 
+    @PreAuthorize("hasAnyRole('COLLECTOR', 'ADMIN')")
     @PutMapping
     public ResponseEntity<TerminalReadDTO> updateTerminal(@Valid @RequestBody TerminalUpdateDTO terminalUpdateDTO) {
         TerminalReadDTO updatedTerminal = terminalService.updateTerminal(terminalUpdateDTO);
@@ -53,6 +56,7 @@ public class TerminalController {
         return ResponseEntity.ok().body(updatedTerminal);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteTerminal(@PathVariable String id) {
         boolean deleted = terminalService.deleteTerminal(id);
